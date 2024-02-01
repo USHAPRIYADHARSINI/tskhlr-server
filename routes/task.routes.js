@@ -135,7 +135,7 @@ router.put('/edit/:userId/:taskId', async function(request, response){     //✔
         taskStatus: taskStatus
     })
 
-      response.status(200).send({msg:"Task deleted"})
+      response.status(200).send({msg: taskStatus})
     }
   })
 
