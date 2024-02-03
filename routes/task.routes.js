@@ -8,9 +8,9 @@ import { getUserById, } from "../services/user.services.js";
 dotenv.config();
 // import nodemailer from "nodemailer";
 import {auth} from '../middleware/auth.js';
-import { NewTask, getAllTasks } from '../services/task.services.js';
+import { EditTask, NewTask, getAllTasks, getTaskById } from '../services/task.services.js';
 
-router.get('/all/:userId', async function(request, response){     //✔️
+router.get('/all/:userId', async function(request, response){     //✔️ works
     const { userId } = request.params;
     console.log(userId);
 
@@ -51,24 +51,31 @@ router.put('/edit/:userId/:taskId', async function(request, response){     //✔
     const {title, details, deadline, taskStatus, remainder} = request.body; 
     const { userId, taskId } = request.params;
     console.log(request.body);
+try{
+  const userFromDb = await getUserById(userId);
+  const taskfromdb = await getTaskById(taskId)
+  console.log(userFromDb,taskfromdb,"before process")
 
-    const userFromDb = await getUserById(userId);
-    const taskfromdb = await getTaskById(taskId)
-
-    if(!userFromDb || !taskfromdb){
-      response.status(400).send({msg:"User or task doesnot exist"})
-    }else{
-      const result = await EditTask({
-        title:title,
-        details:details,
-        deadline: deadline,
-        taskStatus:taskStatus,
-        remainder:remainder,
-        taskId:taskId,
-        userId: userId
-      });
-      response.status(200).send({msg:"Task edited",data:result})
+  if(!userFromDb || !taskfromdb){
+    response.status(400).send({msg:"User or task doesnot exist"})
+  }else{
+    const task = {
+      title:title,
+      details:details,
+      deadline: deadline,
+      taskStatus:taskStatus,
+      remainder:remainder,
+      userId: userId
     }
+    console.log("task",task)
+    const result = await EditTask({task,taskId});
+    console.log("result",result)
+    response.status(200).send({msg:"Task edited",data:result})
+  }
+}catch(err){
+  response.status(400).send({msg:"Server side error"})
+}
+    
   })
 
   router.put('/delete/:userId/:taskId', async function(request, response){     //✔️

@@ -116,7 +116,7 @@ async function genHashedPassword(password){
     console.log(password,storedPassword)
     if(isPasswordMatch){
       console.log(process.env.SECRET_KEY)
-      const token = jwt.sign({userId:userFromDb.userId, username:userFromDb.name}, process.env.SECRET_KEY)
+      const token = jwt.sign({userId:userFromDb.userId, userName:userFromDb.userName, email:email}, process.env.SECRET_KEY)
       response.status(200).send({msg:"Login Successfully",token:token,userDetail:userFromDb})
       console.log(token, "from backend login")
     }else{

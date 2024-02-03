@@ -24,7 +24,7 @@ app.get("/", function (request, response) {
 });
 
 app.use("/users", userRouter);
-app.use("/users/task", taskRouter);
+app.use("/task", taskRouter);
 
 app.listen(PORT, () => console.log("server started on port : ", PORT));
 
