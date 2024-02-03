@@ -6,9 +6,67 @@ import jwt from "jsonwebtoken";
 import * as dotenv from 'dotenv'
 import { getUserById, } from "../services/user.services.js";
 dotenv.config();
-// import nodemailer from "nodemailer";
+import nodemailer from "nodemailer";
 import {auth} from '../middleware/auth.js';
-import { EditTask, NewTask, getAllTasks, getTaskById } from '../services/task.services.js';
+import { EditTask, LookupAllData, NewTask, getAllTasks, getEveryoneTasks, getTaskById } from '../services/task.services.js';
+import schedule from 'node-schedule';
+
+
+export const defaultFunc = async() => {
+
+const functiond = async (r) => {
+  console.log(r)
+ let d = await r.remainder.split(/[.:T\-=/_]/).reverse()
+ d.splice(0,1)
+ console.log(d,r.user[0].email,"d here")
+
+  const job = schedule.scheduleJob(`${d[0]} ${d[1]} ${d[2]} ${d[3]} ${d[4]} *`, ()=>{
+    // console.log('The answer to life, the universe, and everything!', d, r.title);
+    if(r.user[0].email){
+      var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL,
+          pass: process.env.EMAIL_PASSWORD
+        }
+      });
+      var mailOptions = {
+        from:process.env.EMAIL,
+        to:r.user[0].email,
+        subject:"Remainder mail",
+        text:`This is your remainder for task ${r.title} and the deadline is ${r.deadline}`
+      }
+      transporter.sendMail(mailOptions,(error,info) => {
+        if(error){
+          response.status(401).send({msg:"Email Not Send"})
+          console.log(error,"error")
+        }else{
+          response.status(201).send({msg:"Email Sent Successfully"})
+          console.log("remainder sent successfully")
+        }
+      })
+    }
+  });
+}
+  // const allTasks = await getEveryoneTasks()
+  const allData = await client.db('taskhandler').collection('task').aggregate(
+    [
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "userId",
+            as: "user",
+          }
+        }
+      ]
+).toArray()
+
+  console.log(allData[0].user[0].email)
+    allData.map((m)=>(
+    functiond(m)
+    ))
+}
 
 router.get('/all/:userId', async function(request, response){     //✔️ works
     const { userId } = request.params;

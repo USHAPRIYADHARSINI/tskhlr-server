@@ -4,7 +4,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 import cors from "cors";
 import userRouter from "./routes/user.routes.js";
-import taskRouter from "./routes/task.routes.js";
+import taskRouter, { defaultFunc } from "./routes/task.routes.js";
 
 const app = express();
 app.use(express.json());
@@ -26,6 +26,8 @@ app.get("/", function (request, response) {
 app.use("/users", userRouter);
 app.use("/task", taskRouter);
 
+
 app.listen(PORT, () => console.log("server started on port : ", PORT));
 
 export { client };
+defaultFunc()

@@ -10,6 +10,7 @@ dotenv.config();
 import {auth} from '../middleware/auth.js';
 import crypto from "crypto";
 
+
 async function genHashedPassword(password){
     const NO_OF_ROUND = 10;
     const salt = await bcrypt.genSalt(NO_OF_ROUND);
